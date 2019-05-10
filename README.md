@@ -1,0 +1,1 @@
+# reactstrap-smart-pagination
