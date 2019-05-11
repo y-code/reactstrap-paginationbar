@@ -1,1 +1,1 @@
-# reactstrap-smart-pagination
+# Reactstrap Paginationbar
