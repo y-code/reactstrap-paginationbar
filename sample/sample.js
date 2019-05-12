@@ -78,6 +78,8 @@ class Sample2 extends React.Component {
     this.state = {
       current: 2,
       pageSize: 6,
+      visibility: 3,
+      ellipsis: true,
     };
   }
 
@@ -98,22 +100,58 @@ class Sample2 extends React.Component {
           </Col>
         </Row>
         <Row>
+          <Col sm='4'>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                Page Number Visibility Level
+              </Col>
+            </Row>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                <ButtonGroup>
+                  <Button onClick={() => this.setState({visibility: 0})} active={this.state.visibility === 0}>0</Button>
+                  <Button onClick={() => this.setState({visibility: 1})} active={this.state.visibility === 1}>1</Button>
+                  <Button onClick={() => this.setState({visibility: 2})} active={this.state.visibility === 2}>2</Button>
+                  <Button onClick={() => this.setState({visibility: 3})} active={this.state.visibility === 3}>3</Button>
+                </ButtonGroup>
+              </Col>
+            </Row>
+          </Col>
+          <Col sm='4'>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                Ellipsis Usage
+              </Col>
+            </Row>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                <ButtonGroup>
+                  <Button onClick={() => this.setState({ellipsis: true})} active={this.state.ellipsis}>Use ellipsis</Button>
+                  <Button onClick={() => this.setState({ellipsis: false})} active={!this.state.ellipsis}>No ellipsis</Button>
+                </ButtonGroup>
+              </Col>
+            </Row>
+          </Col>
+          <Col sm='4'>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                Items in Page
+              </Col>
+            </Row>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                <ButtonGroup>
+                  <Button onClick={() => this.setState({pageSize: 3})} active={this.state.pageSize === 3}>3</Button>
+                  <Button onClick={() => this.setState({pageSize: 6})} active={this.state.pageSize === 6}>6</Button>
+                  <Button onClick={() => this.setState({pageSize: 9})} active={this.state.pageSize === 9}>9</Button>
+                </ButtonGroup>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Row>
           <Col className='d-flex justify-content-center'>
             Page {this.state.current}: Items from {this.state.fromItem} to {this.state.toItem} while total is {this.props.data.length}
-          </Col>
-        </Row>
-        <Row>
-          <Col className='d-flex justify-content-center'>
-            Items in Page
-          </Col>
-        </Row>
-        <Row>
-          <Col className='d-flex justify-content-center'>
-            <ButtonGroup>
-              <Button onClick={() => this.setState({pageSize: 3})} active={this.state.pageSize === 3}>3</Button>
-              <Button onClick={() => this.setState({pageSize: 6})} active={this.state.pageSize === 6}>6</Button>
-              <Button onClick={() => this.setState({pageSize: 9})} active={this.state.pageSize === 9}>9</Button>
-            </ButtonGroup>
           </Col>
         </Row>
         <Row>
@@ -124,7 +162,10 @@ class Sample2 extends React.Component {
               totalItems={this.props.data.length}
               pageSize={this.state.pageSize}
               current={this.state.current}
-              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}/>
+              visibility={this.state.visibility}
+              ellipsis={this.state.ellipsis}
+              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}
+            />
           </Col>
         </Row>
         <Row>
@@ -155,7 +196,10 @@ class Sample2 extends React.Component {
               totalItems={this.props.data.length}
               pageSize={this.state.pageSize}
               current={this.state.current}
-              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}/>
+              visibility={this.state.visibility}
+              ellipsis={this.state.ellipsis}
+              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}
+            />
           </Col>
         </Row>
       </Container>
@@ -164,7 +208,7 @@ class Sample2 extends React.Component {
 }
 
 let data1 = []
-for (let i = 0; i < 50; i++)
+for (let i = 0; i < 80; i++)
   data1.push({
     name: `Item ${i}`
   })

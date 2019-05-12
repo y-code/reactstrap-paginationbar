@@ -1,13 +1,14 @@
 import React from 'react'
-import Reactstrap from 'reactstrap'
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 const propTypes = {
   totalItems: PropTypes.number,
   pageSize: PropTypes.number,
   first: PropTypes.number,
   current: PropTypes.number,
+  visibility: PropTypes.number,
+  ellipsis: PropTypes.bool,
   onTurnPage: PropTypes.func,
 }
 
@@ -16,6 +17,8 @@ const defaultProps = {
   pageSize: 10,
   first: 1,
   current: 0,
+  visibility: 3,
+  ellipsis: true,
   onTurnPage: (page, fromItem, toItem) => {},
 }
 
@@ -43,7 +46,7 @@ class Paginationbar extends React.Component {
       || nextProps.totalItems !== this.props.totalItems
       || nextProps.pageSize !== this.props.pageSize) {
         this.lastPage = getLastPage(nextProps.first, nextProps.totalItems, nextProps.pageSize)
-        this.triggerTurnPage(this.props.first, nextProps)
+        this.triggerTurnPage(nextProps.first, nextProps)
       }
   }
 
@@ -70,8 +73,6 @@ class Paginationbar extends React.Component {
 
   render() {
     const {
-      totalItems,
-      pageSize,
       className,
       listClassName,
       cssModule,
@@ -88,39 +89,94 @@ class Paginationbar extends React.Component {
     const nextPage = currentPage < lastPage ? currentPage + 1 : lastPage
 
     return (
-      <Reactstrap.Pagination {...{className, listClassName, cssModule, size, tag, listTag, 'aria-label': label}}>
-        <Reactstrap.PaginationItem onClick={() => this.handleGoTo(firstPage)} disabled={firstPage === currentPage}>
-          <Reactstrap.PaginationLink first />
-        </Reactstrap.PaginationItem>
-        <Reactstrap.PaginationItem onClick={() => this.handleGoTo(previousPage)} disabled={previousPage === currentPage}>
-          <Reactstrap.PaginationLink previous />
-        </Reactstrap.PaginationItem>
+      <Pagination {...{className, listClassName, cssModule, size, tag, listTag, 'aria-label': label}}>
+        <PaginationItem onClick={() => this.handleGoTo(firstPage)} disabled={firstPage === currentPage}>
+          <PaginationLink first />
+        </PaginationItem>
+        <PaginationItem onClick={() => this.handleGoTo(previousPage)} disabled={previousPage === currentPage}>
+          <PaginationLink previous />
+        </PaginationItem>
         {this.renderPages(currentPage, firstPage, lastPage)}
-        <Reactstrap.PaginationItem onClick={() => this.handleGoTo(nextPage)} disabled={nextPage === currentPage}>
-          <Reactstrap.PaginationLink next />
-        </Reactstrap.PaginationItem>
-        <Reactstrap.PaginationItem onClick={() => this.handleGoTo(lastPage)} disabled={lastPage === currentPage}>
-          <Reactstrap.PaginationLink last />
-        </Reactstrap.PaginationItem>
-      </Reactstrap.Pagination>
+        <PaginationItem onClick={() => this.handleGoTo(nextPage)} disabled={nextPage === currentPage}>
+          <PaginationLink next />
+        </PaginationItem>
+        <PaginationItem onClick={() => this.handleGoTo(lastPage)} disabled={lastPage === currentPage}>
+          <PaginationLink last />
+        </PaginationItem>
+      </Pagination>
     )
   }
 
   renderPages(currentPage, firstPage, lastPage) {
+    const {
+      visibility,
+      ellipsis,
+    } = this.props
     let pages = []
-    for (let i = firstPage; i <= lastPage; i++) {
+    let visibleFirstPage, visibleLastPage
+    let hasPreviousEllipsis = false
+    let hasNextEllipsis = false
+
+    if (!visibility) {
+      visibleFirstPage = firstPage
+      visibleLastPage = lastPage
+    } else if (lastPage < visibility * 2) {
+      visibleFirstPage = firstPage
+      visibleLastPage = lastPage
+    } else if (currentPage < visibility + 1) {
+      visibleFirstPage = firstPage
+      visibleLastPage = firstPage + (visibility - 1) * 2 + (ellipsis ? 1 : 0)
+      hasPreviousEllipsis = false
+      hasNextEllipsis = true
+      } else if (currentPage > lastPage - visibility) {
+      visibleFirstPage = lastPage - (visibility - 1) * 2 + (ellipsis ? -1 : 0)
+      visibleLastPage = lastPage
+      hasPreviousEllipsis = true
+      hasNextEllipsis = false
+      } else {
+      visibleFirstPage = currentPage - visibility + 1
+      visibleLastPage = currentPage + visibility - 1
+      hasPreviousEllipsis = true
+      hasNextEllipsis = true
+      }
+
+    if (ellipsis && hasPreviousEllipsis)
       pages.push(
-        <Reactstrap.PaginationItem
+        <PaginationItem
+          key={`page-previous-ellipsis`}
+          disabled
+        >
+          <PaginationLink>
+            &hellip;
+          </PaginationLink>
+        </PaginationItem>
+      )
+
+    for (let i = visibleFirstPage; i <= visibleLastPage; i++)
+      pages.push(
+        <PaginationItem
           key={`page-${i}`}
           onClick={() => this.handleGoTo(i)}
           active={i === currentPage}
         >
-          <Reactstrap.PaginationLink>
+          <PaginationLink>
             {i}
-          </Reactstrap.PaginationLink>
-        </Reactstrap.PaginationItem>
+          </PaginationLink>
+        </PaginationItem>
       )
-    }
+
+    if (ellipsis && hasNextEllipsis)
+      pages.push(
+        <PaginationItem
+          key={`page-next-ellipsis`}
+          disabled
+        >
+          <PaginationLink>
+            &hellip;
+          </PaginationLink>
+        </PaginationItem>
+      )
+
     return pages
   }
 }
