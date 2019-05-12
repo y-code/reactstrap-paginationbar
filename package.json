@@ -1,6 +1,6 @@
 {
   "name": "reactstrap-paginationbar",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "React Bootstrap 4 component for pagination",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
