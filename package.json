@@ -26,6 +26,15 @@
     "type": "git",
     "url": "git+https://github.com/y-code/reactstrap-paginationbar.git"
   },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "lib",
+    "dist",
+    "src",
+    "es"
+  ],
   "keywords": [
     "reactstrap",
     "bootstrap",
