@@ -2,10 +2,9 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('react'), require('reactstrap')) :
   typeof define === 'function' && define.amd ? define(['exports', 'react', 'reactstrap'], factory) :
   (global = global || self, factory(global.ReactstrapPaginationbar = {}, global.React, global.Reactstrap));
-}(this, function (exports, React, Reactstrap) { 'use strict';
+}(this, function (exports, React, reactstrap) { 'use strict';
 
   React = React && React.hasOwnProperty('default') ? React['default'] : React;
-  Reactstrap = Reactstrap && Reactstrap.hasOwnProperty('default') ? Reactstrap['default'] : Reactstrap;
 
   function _inheritsLoose(subClass, superClass) {
     subClass.prototype = Object.create(superClass.prototype);
@@ -390,60 +389,13 @@
     }
   });
 
-  var classnames = createCommonjsModule(function (module) {
-    /*!
-      Copyright (c) 2017 Jed Watson.
-      Licensed under the MIT License (MIT), see
-      http://jedwatson.github.io/classnames
-    */
-
-    /* global define */
-    (function () {
-
-      var hasOwn = {}.hasOwnProperty;
-
-      function classNames() {
-        var classes = [];
-
-        for (var i = 0; i < arguments.length; i++) {
-          var arg = arguments[i];
-          if (!arg) continue;
-          var argType = typeof arg;
-
-          if (argType === 'string' || argType === 'number') {
-            classes.push(arg);
-          } else if (Array.isArray(arg) && arg.length) {
-            var inner = classNames.apply(null, arg);
-
-            if (inner) {
-              classes.push(inner);
-            }
-          } else if (argType === 'object') {
-            for (var key in arg) {
-              if (hasOwn.call(arg, key) && arg[key]) {
-                classes.push(key);
-              }
-            }
-          }
-        }
-
-        return classes.join(' ');
-      }
-
-      if (module.exports) {
-        classNames.default = classNames;
-        module.exports = classNames;
-      } else {
-        window.classNames = classNames;
-      }
-    })();
-  });
-
   var propTypes$1 = {
     totalItems: propTypes.number,
     pageSize: propTypes.number,
     first: propTypes.number,
     current: propTypes.number,
+    visibility: propTypes.number,
+    ellipsis: propTypes.bool,
     onTurnPage: propTypes.func
   };
   var defaultProps = {
@@ -451,6 +403,8 @@
     pageSize: 10,
     first: 1,
     current: 0,
+    visibility: 3,
+    ellipsis: true,
     onTurnPage: function onTurnPage(page, fromItem, toItem) {}
   };
 
@@ -485,11 +439,8 @@
       }
 
       if (nextProps.first !== this.props.first || nextProps.totalItems !== this.props.totalItems || nextProps.pageSize !== this.props.pageSize) {
-        // this.setState({
-        //   current: this.props.first
-        // })
         this.lastPage = getLastPage(nextProps.first, nextProps.totalItems, nextProps.pageSize);
-        this.triggerTurnPage(this.props.first, nextProps);
+        this.triggerTurnPage(nextProps.first, nextProps);
       }
     };
 
@@ -513,8 +464,6 @@
       var _this2 = this;
 
       var _this$props = this.props,
-          totalItems = _this$props.totalItems,
-          pageSize = _this$props.pageSize,
           className = _this$props.className,
           listClassName = _this$props.listClassName,
           cssModule = _this$props.cssModule,
@@ -527,7 +476,7 @@
       var lastPage = this.lastPage;
       var previousPage = currentPage > firstPage ? currentPage - 1 : firstPage;
       var nextPage = currentPage < lastPage ? currentPage + 1 : lastPage;
-      return React.createElement(Reactstrap.Pagination, {
+      return React.createElement(reactstrap.Pagination, {
         className: className,
         listClassName: listClassName,
         cssModule: cssModule,
@@ -535,33 +484,33 @@
         tag: tag,
         listTag: listTag,
         'aria-label': label
-      }, React.createElement(Reactstrap.PaginationItem, {
+      }, React.createElement(reactstrap.PaginationItem, {
         onClick: function onClick() {
           return _this2.handleGoTo(firstPage);
         },
         disabled: firstPage === currentPage
-      }, React.createElement(Reactstrap.PaginationLink, {
+      }, React.createElement(reactstrap.PaginationLink, {
         first: true
-      })), React.createElement(Reactstrap.PaginationItem, {
+      })), React.createElement(reactstrap.PaginationItem, {
         onClick: function onClick() {
           return _this2.handleGoTo(previousPage);
         },
         disabled: previousPage === currentPage
-      }, React.createElement(Reactstrap.PaginationLink, {
+      }, React.createElement(reactstrap.PaginationLink, {
         previous: true
-      })), this.renderPages(currentPage, firstPage, lastPage), React.createElement(Reactstrap.PaginationItem, {
+      })), this.renderPages(currentPage, firstPage, lastPage), React.createElement(reactstrap.PaginationItem, {
         onClick: function onClick() {
           return _this2.handleGoTo(nextPage);
         },
         disabled: nextPage === currentPage
-      }, React.createElement(Reactstrap.PaginationLink, {
+      }, React.createElement(reactstrap.PaginationLink, {
         next: true
-      })), React.createElement(Reactstrap.PaginationItem, {
+      })), React.createElement(reactstrap.PaginationItem, {
         onClick: function onClick() {
           return _this2.handleGoTo(lastPage);
         },
         disabled: lastPage === currentPage
-      }, React.createElement(Reactstrap.PaginationLink, {
+      }, React.createElement(reactstrap.PaginationLink, {
         last: true
       })));
     };
@@ -569,22 +518,60 @@
     _proto.renderPages = function renderPages(currentPage, firstPage, lastPage) {
       var _this3 = this;
 
+      var _this$props2 = this.props,
+          visibility = _this$props2.visibility,
+          ellipsis = _this$props2.ellipsis;
       var pages = [];
+      var visibleFirstPage, visibleLastPage;
+      var hasPreviousEllipsis = false;
+      var hasNextEllipsis = false;
+
+      if (!visibility) {
+        visibleFirstPage = firstPage;
+        visibleLastPage = lastPage;
+      } else if (lastPage < visibility * 2) {
+        visibleFirstPage = firstPage;
+        visibleLastPage = lastPage;
+      } else if (currentPage < visibility + 1) {
+        visibleFirstPage = firstPage;
+        visibleLastPage = firstPage + (visibility - 1) * 2 + (ellipsis ? 1 : 0);
+        hasPreviousEllipsis = false;
+        hasNextEllipsis = true;
+      } else if (currentPage > lastPage - visibility) {
+        visibleFirstPage = lastPage - (visibility - 1) * 2 + (ellipsis ? -1 : 0);
+        visibleLastPage = lastPage;
+        hasPreviousEllipsis = true;
+        hasNextEllipsis = false;
+      } else {
+        visibleFirstPage = currentPage - visibility + 1;
+        visibleLastPage = currentPage + visibility - 1;
+        hasPreviousEllipsis = true;
+        hasNextEllipsis = true;
+      }
+
+      if (ellipsis && hasPreviousEllipsis) pages.push(React.createElement(reactstrap.PaginationItem, {
+        key: "page-previous-ellipsis",
+        disabled: true
+      }, React.createElement(reactstrap.PaginationLink, null, "\u2026")));
 
       var _loop = function _loop(i) {
-        pages.push(React.createElement(Reactstrap.PaginationItem, {
+        pages.push(React.createElement(reactstrap.PaginationItem, {
           key: "page-" + i,
           onClick: function onClick() {
             return _this3.handleGoTo(i);
           },
           active: i === currentPage
-        }, React.createElement(Reactstrap.PaginationLink, null, i)));
+        }, React.createElement(reactstrap.PaginationLink, null, i)));
       };
 
-      for (var i = firstPage; i <= lastPage; i++) {
+      for (var i = visibleFirstPage; i <= visibleLastPage; i++) {
         _loop(i);
       }
 
+      if (ellipsis && hasNextEllipsis) pages.push(React.createElement(reactstrap.PaginationItem, {
+        key: "page-next-ellipsis",
+        disabled: true
+      }, React.createElement(reactstrap.PaginationLink, null, "\u2026")));
       return pages;
     };
 
