@@ -28,7 +28,7 @@ Now, you can use Paginationbar tag in JSX code.
       onTurnPage={(page, fromItem, toItem) => this.setState({ page, fromItem, toItem })}
     />
 
-Set total number of items to `totalItems` that you want to paginate for. The handler of `onTurnPage` receives 3 values; current page number in `page`, zero-based index of the first item at the page in `fromItem`, and zero-based index of the last item at the page in `toItem`.
+Set total number of items to `totalItems`, which you want to paginate for. The handler of `onTurnPage` receives 3 values that you can use for rendering the items on the current page. `page` is the current page number, `fromItem` is zero-based index of the first item at the page, and `toItem` is zero-based index of the last item at the page.
 
 A working code sample is available in CodeSandbox. Please try and find out how much nice 'n' easy and configurable Paginationbar is!
 
