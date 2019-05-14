@@ -28,7 +28,23 @@ Now, you can use Paginationbar tag in JSX code.
       onTurnPage={(page, fromItem, toItem) => this.setState({ page, fromItem, toItem })}
     />
 
+Set total number of items to `totalItems` that you want to paginate for. The handler of `onTurnPage` receives 3 values; current page number in `page`, zero-based index of the first item at the page in `fromItem`, and zero-based index of the last item at the page in `toItem`.
 
 A working code sample is available in CodeSandbox. Please try and find out how much nice 'n' easy and configurable Paginationbar is!
+
+[![Edit p3yjn7rpv0](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/p3yjn7rpv0?fontsize=14)
+
+## Advanced Usage
+
+### Synchronization with other paginationbars
+When we want to have pagination UI on both top and bottom of a table, for example, then those pagination UI should synchronize each other. In this case, add `current={this.props.page}` attribute on both Paginationbar tags, then operations in one will also be applied on the other.
+
+    <Paginationbar
+      totalItems={this.props.data.length}
+      current={this.props.page}
+      onTurnPage={(page, fromItem, toItem) => this.setState({ page, fromItem, toItem })}
+    />
+
+This is also used in the working code sample. Please see how it works in CodeSandbox.
 
 [![Edit p3yjn7rpv0](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/p3yjn7rpv0?fontsize=14)
