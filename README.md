@@ -36,6 +36,31 @@ A working code sample is available in CodeSandbox. Please try and find out how m
 
 ## Advanced Usage
 
+### Page Number Visibility Level
+Page Number Visibility Level identifies how many page numbers are displayed on the bar.
+
+Although the level is represented by number, this does not mean that the number of page numbers are displayed. The followings are examples of how it looks in Level 0, 1, 2 and 3.
+
+Level 0: `<Paginationbar totalItems={77} visibility={0} />`
+
+![Page Number Visibility Level 0](https://github.com/y-code/reactstrap-paginationbar/blob/master/docs/images/visibility-0.png)
+
+Level 1: `<Paginationbar totalItems={77} visibility={1} />`
+
+![Page Number Visibility Level 0](https://github.com/y-code/reactstrap-paginationbar/blob/master/docs/images/visibility-1.png)
+
+Level 2: `<Paginationbar totalItems={77} visibility={2} />`
+
+![Page Number Visibility Level 0](https://github.com/y-code/reactstrap-paginationbar/blob/master/docs/images/visibility-2.png)
+
+Level 3: `<Paginationbar totalItems={77} visibility={3} />`
+
+![Page Number Visibility Level 0](https://github.com/y-code/reactstrap-paginationbar/blob/master/docs/images/visibility-3.png)
+
+You can easily switch Page Number Visibility Level and see the difference in the working code sample.
+
+[![Edit p3yjn7rpv0](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/p3yjn7rpv0?fontsize=14)
+
 ### Synchronization with other paginationbars
 When we want to have pagination UI on both top and bottom of a table, for example, then those pagination UI should synchronize each other. In this case, add `current={this.props.page}` attribute on both Paginationbar tags, then operations in one will also be applied on the other.
 
