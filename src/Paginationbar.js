@@ -19,7 +19,6 @@ const defaultProps = {
   current: 0,
   visibility: 3,
   ellipsis: true,
-  onTurnPage: (page, fromItem, toItem) => {},
 }
 
 class Paginationbar extends React.Component {
@@ -68,7 +67,8 @@ class Paginationbar extends React.Component {
     } = props
     const fromItem = pageSize * (page - 1)
     const toItem = Math.min(pageSize * page - 1, totalItems - 1)
-    this.props.onTurnPage(page, fromItem, toItem)
+    if (this.props.onTurnPage)
+      this.props.onTurnPage({ page, fromItem, toItem })
   }
 
   render() {
@@ -90,7 +90,7 @@ class Paginationbar extends React.Component {
 
     return (
       <Pagination {...{className, listClassName, cssModule, size, tag, listTag, 'aria-label': label}}>
-        <PaginationItem onClick={() => this.handleGoTo(firstPage)} disabled={firstPage === currentPage}>
+        <PaginationItem onClick={() => { if (firstPage !== currentPage) this.handleGoTo(firstPage) }} disabled={firstPage === currentPage}>
           <PaginationLink first />
         </PaginationItem>
         <PaginationItem onClick={() => this.handleGoTo(previousPage)} disabled={previousPage === currentPage}>

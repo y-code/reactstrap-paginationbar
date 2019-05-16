@@ -11,18 +11,11 @@ class Sample1 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      current: 0,
-      fromItem: 0,
-      toItem: 0,
     };
   }
 
-  handleTurnPage(page, fromItem, toItem) {
-    this.setState({
-      current: page,
-      fromItem,
-      toItem,
-    })
+  handleTurnPage(e) {
+    this.setState(e)
   }
 
   render() {
@@ -35,16 +28,15 @@ class Sample1 extends React.Component {
         </Row>
         <Row>
           <Col className='d-flex justify-content-center'>
-            Page {this.state.current}: Items from {this.state.fromItem} to {this.state.toItem} while total is {this.props.data.length}.
+            Page {this.state.page}: Items from {this.state.fromItem} to {this.state.toItem} while total is {this.props.data.length}.
           </Col>
         </Row>
         <Row>
           <Col className='d-flex justify-content-center'>
             <ReactstrapPaginationbar.Paginationbar
-              className='sample'
               size='lg'
               totalItems={this.props.data.length}
-              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}/>
+              onTurnPage={e => this.handleTurnPage(e)}/>
           </Col>
         </Row>
         <Row>
@@ -76,19 +68,15 @@ class Sample2 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      current: 2,
+      page: 2,
       pageSize: 6,
       visibility: 3,
       ellipsis: true,
     };
   }
 
-  handleTurnPage(page, fromItem, toItem) {
-    this.setState({
-      current: page,
-      fromItem,
-      toItem,
-    })
+  handleTurnPage(e) {
+    this.setState(e)
   }
 
   render() {
@@ -100,6 +88,22 @@ class Sample2 extends React.Component {
           </Col>
         </Row>
         <Row>
+          <Col sm='4'>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                Items in Page
+              </Col>
+            </Row>
+            <Row>
+              <Col className='d-flex justify-content-center'>
+                <ButtonGroup>
+                  <Button onClick={() => this.setState({pageSize: 3})} active={this.state.pageSize === 3}>3</Button>
+                  <Button onClick={() => this.setState({pageSize: 6})} active={this.state.pageSize === 6}>6</Button>
+                  <Button onClick={() => this.setState({pageSize: 9})} active={this.state.pageSize === 9}>9</Button>
+                </ButtonGroup>
+              </Col>
+            </Row>
+          </Col>
           <Col sm='4'>
             <Row>
               <Col className='d-flex justify-content-center'>
@@ -132,39 +136,22 @@ class Sample2 extends React.Component {
               </Col>
             </Row>
           </Col>
-          <Col sm='4'>
-            <Row>
-              <Col className='d-flex justify-content-center'>
-                Items in Page
-              </Col>
-            </Row>
-            <Row>
-              <Col className='d-flex justify-content-center'>
-                <ButtonGroup>
-                  <Button onClick={() => this.setState({pageSize: 3})} active={this.state.pageSize === 3}>3</Button>
-                  <Button onClick={() => this.setState({pageSize: 6})} active={this.state.pageSize === 6}>6</Button>
-                  <Button onClick={() => this.setState({pageSize: 9})} active={this.state.pageSize === 9}>9</Button>
-                </ButtonGroup>
-              </Col>
-            </Row>
-          </Col>
         </Row>
         <Row>
           <Col className='d-flex justify-content-center'>
-            Page {this.state.current}: Items from {this.state.fromItem} to {this.state.toItem} while total is {this.props.data.length}
+            Page {this.state.page}: Items from {this.state.fromItem} to {this.state.toItem} while total is {this.props.data.length}
           </Col>
         </Row>
         <Row>
           <Col className='d-flex justify-content-center'>
             <ReactstrapPaginationbar.Paginationbar
               className='sample'
-              size='sm'
               totalItems={this.props.data.length}
               pageSize={this.state.pageSize}
-              current={this.state.current}
+              current={this.state.page}
               visibility={this.state.visibility}
               ellipsis={this.state.ellipsis}
-              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}
+              onTurnPage={e => this.handleTurnPage(e)}
             />
           </Col>
         </Row>
@@ -195,10 +182,10 @@ class Sample2 extends React.Component {
               size='sm'
               totalItems={this.props.data.length}
               pageSize={this.state.pageSize}
-              current={this.state.current}
+              current={this.state.page}
               visibility={this.state.visibility}
               ellipsis={this.state.ellipsis}
-              onTurnPage={(page, fromItem, toItem) => this.handleTurnPage(page, fromItem, toItem)}
+              onTurnPage={e => this.handleTurnPage(e)}
             />
           </Col>
         </Row>
