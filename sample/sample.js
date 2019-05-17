@@ -8,12 +8,6 @@ const ButtonGroup = Reactstrap.ButtonGroup
 const Button = Reactstrap.Button
 
 class Sample1 extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
   render() {
     return (
       <Container>
