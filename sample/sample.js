@@ -46,7 +46,7 @@ class Sample1 extends React.Component {
               </thead>
               <tbody>
                 {this.props.data.slice(this.state.fromItem, this.state.toItem + 1).map((d, i) =>
-                  <tr key={`row-${i}`}>
+                  <tr key={`sample1-row-${i}`}>
                     <td>{this.state.fromItem + i}</td>
                     <td>{d.name}</td>
                   </tr>
@@ -132,7 +132,7 @@ class Sample2 extends React.Component {
         </thead>
         <tbody>
           {this.props.data.slice(this.state.fromItem, this.state.toItem + 1).map((d, i) =>
-            <tr key={`row-${i}`}>
+            <tr key={`sample2-row-${i}`}>
               <td>{this.state.fromItem + i}</td>
               <td>{d.name}</td>
             </tr>
