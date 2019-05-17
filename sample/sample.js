@@ -14,10 +14,6 @@ class Sample1 extends React.Component {
     };
   }
 
-  handleTurnPage(e) {
-    this.setState(e)
-  }
-
   render() {
     return (
       <Container>
@@ -36,7 +32,7 @@ class Sample1 extends React.Component {
             <ReactstrapPaginationbar.Paginationbar
               size='lg'
               totalItems={this.props.data.length}
-              onTurnPage={e => this.handleTurnPage(e)}/>
+              onTurnPage={e => this.setState(e)}/>
           </Col>
         </Row>
         <Row>
@@ -73,10 +69,6 @@ class Sample2 extends React.Component {
       visibility: 3,
       ellipsis: true,
     };
-  }
-
-  handleTurnPage(e) {
-    this.setState(e)
   }
 
   render() {
@@ -151,7 +143,7 @@ class Sample2 extends React.Component {
               current={this.state.page}
               visibility={this.state.visibility}
               ellipsis={this.state.ellipsis}
-              onTurnPage={e => this.handleTurnPage(e)}
+              onTurnPage={e => this.setState(e)}
             />
           </Col>
         </Row>
@@ -185,7 +177,7 @@ class Sample2 extends React.Component {
               current={this.state.page}
               visibility={this.state.visibility}
               ellipsis={this.state.ellipsis}
-              onTurnPage={e => this.handleTurnPage(e)}
+              onTurnPage={e => this.setState(e)}
             />
           </Col>
         </Row>
