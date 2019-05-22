@@ -11,7 +11,7 @@ export default (props) => {
         title="reactstrap Paginationbar"
         defaultTitle="reactstrap Paginationbar"
         meta={[
-            { 'name': 'description', 'content': 'reactstrap paginationbar - easy to use React Bootstrap 4 Pagination components based on reactstrap' },
+            { 'name': 'description', 'content': 'reactstrap paginationbar - easy to use Bootstrap 4 Pagination components based on reactstrap' },
             { 'property': 'og:type', 'content': 'article' }
         ]}
       />
