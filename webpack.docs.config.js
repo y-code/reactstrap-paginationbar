@@ -11,36 +11,7 @@ const env = process.env.WEBPACK_BUILD || process.env.NODE_ENV || 'development';
 const paths = [
   '/',
   '/components/',
-  '/components/layout/',
-  '/components/navs/',
-  '/components/navbar/',
-  '/components/breadcrumbs/',
-  '/components/buttons/',
-  '/components/button-group/',
-  '/components/button-toolbar/',
-  '/components/button-dropdown/',
-  '/components/dropdowns/',
-  '/components/form/',
-  '/components/input-group/',
-  '/components/popovers/',
-  '/components/progress/',
-  '/components/tooltips/',
-  '/components/modals/',
-  '/components/badge/',
-  '/components/card/',
-  '/components/tables/',
-  '/components/media/',
-  '/components/pagination/',
-  '/components/tabs/',
-  '/components/jumbotron/',
-  '/components/alerts/',
-  '/components/toasts/',
-  '/components/collapse/',
-  '/components/carousel/',
-  '/components/listgroup/',
-  '/utilities/',
-  '/utilities/colors/',
-  '/utilities/clearfix/',
+  '/components/paginationbar/',
   '/404.html'
 ];
 
@@ -107,7 +78,7 @@ const config = {
     extensions: ['.js', '.json'],
     alias: {
       'bootstrap-css': path.join(__dirname, 'node_modules/bootstrap/dist/css/bootstrap.css'),
-      reactstrap: path.resolve('./src')
+      'reactstrap-paginationbar': path.resolve('./src')
     }
   }
 };
