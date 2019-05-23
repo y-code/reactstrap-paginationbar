@@ -24,10 +24,23 @@ describe('Paginationbar', () => {
     })
   })
 
-  describe('Event onTurnPage', () => {
+  describe('Property first', () => {
+    it('should be initially 1 by default', () => {
+      // Total Items: 65
+      // Page size: default (= 10)
+      // First Page: default (= 1)
+      // Current Page: default (= 1)
+      // Visibility Level: default (= 3)
+      const wrapper = mount(<Paginationbar totalItems={65}/>)
+      expect(wrapper.find('li.active').find("button").hostNodes().text()).toBe('1')
+      expect(wrapper.find('li').find("button").hostNodes().at(2).text()).toBe('1')
+    })
+  })
+
+  var testEventOnTurnPage = (c) => {
     it('is called at the initial render', () => {
       const onTurnPage = jest.fn()
-      const wrapper = mount(<Paginationbar onTurnPage={onTurnPage}/>)
+      const wrapper = mount(<Paginationbar onTurnPage={onTurnPage} {...c}/>)
 
       expect(onTurnPage).toHaveBeenCalledTimes(1)
     })
@@ -38,7 +51,7 @@ describe('Paginationbar', () => {
       // Current Page: default (= 1, at the beginning)
       // Visibility Level: 3
       const onTurnPage = jest.fn()
-      const wrapper = mount(<Paginationbar onTurnPage={onTurnPage}/>)
+      const wrapper = mount(<Paginationbar onTurnPage={onTurnPage} {...c}/>)
 
       let clickCount = 1
 
@@ -75,7 +88,7 @@ describe('Paginationbar', () => {
       // Current Page: default (= 1, at the beginning)
       // Visibility Level: 3
       const onTurnPage = jest.fn()
-      const wrapper = mount(<Paginationbar totalItems={10} onTurnPage={onTurnPage}/>)
+      const wrapper = mount(<Paginationbar totalItems={10} onTurnPage={onTurnPage} {...c}/>)
 
       let clickCount = 1
 
@@ -112,7 +125,7 @@ describe('Paginationbar', () => {
       // Current Page: default (= 1, at the beginning)
       // Visibility Level: 3
       const onTurnPage = jest.fn()
-      const wrapper = mount(<Paginationbar totalItems={40} onTurnPage={onTurnPage}/>)
+      const wrapper = mount(<Paginationbar totalItems={40} onTurnPage={onTurnPage} {...c}/>)
 
       let clickCount = 1
 
@@ -167,11 +180,11 @@ describe('Paginationbar', () => {
         // Visibility Level: 3
         let page
         const onTurnPage = jest.fn(e => page = e.page)
-        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage}/>)
+        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage} {...c}/>)
   
         // [Current Page: 1]
         wrapper.find("button").hostNodes().at(5).simulate('click')
-        expect(page).toBe(2)
+        expect(page).toBe(2 + (c.first === undefined ? 1 : c.first) - 1)
       })
   
       it('should be the last page when Go-to-Last button is clicked', () => {
@@ -182,11 +195,11 @@ describe('Paginationbar', () => {
         // Visibility Level: 3
         let page
         const onTurnPage = jest.fn(e => page = e.page)
-        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage}/>)
+        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage} {...c}/>)
   
         // [Current Page: 1]
         wrapper.find("button").hostNodes().at(6).simulate('click')
-        expect(page).toBe(3)
+        expect(page).toBe(3 + (c.first === undefined ? 1 : c.first) - 1)
       })
   
       it('should decrease by 1 when Go-to-Previous button is clicked', () => {
@@ -197,13 +210,13 @@ describe('Paginationbar', () => {
         // Visibility Level: 3
         let page
         const onTurnPage = jest.fn(e => page = e.page)
-        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage}/>)
+        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage} {...c}/>)
   
         // [Current Page: 1]
         wrapper.find("button").hostNodes().at(6).simulate('click')
         // [Current Page: 3]
         wrapper.find("button").hostNodes().at(1).simulate('click')
-        expect(page).toBe(2)
+        expect(page).toBe(2 + (c.first === undefined ? 1 : c.first) - 1)
       })
       
       it('should be the first page when Go-to-Last button is clicked', () => {
@@ -214,13 +227,13 @@ describe('Paginationbar', () => {
         // Visibility Level: 3
         let page
         const onTurnPage = jest.fn(e => page = e.page)
-        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage}/>)
+        const wrapper = mount(<Paginationbar totalItems={30} onTurnPage={onTurnPage} {...c}/>)
   
         // [Current Page: 1]
         wrapper.find("button").hostNodes().at(6).simulate('click')
         // [Current Page: 3]
         wrapper.find("button").hostNodes().at(0).simulate('click')
-        expect(page).toBe(1)
+        expect(page).toBe(1 + (c.first === undefined ? 1 : c.first) - 1)
       })
     })
 
@@ -236,7 +249,7 @@ describe('Paginationbar', () => {
           fromItem = e.fromItem
           toItem = e.toItem
         })
-        const wrapper = mount(<Paginationbar totalItems={15} onTurnPage={onTurnPage}/>)
+        const wrapper = mount(<Paginationbar totalItems={15} onTurnPage={onTurnPage} {...c}/>)
   
         // [Current Page: 1]
         expect(fromItem).toBe(0)
@@ -254,7 +267,7 @@ describe('Paginationbar', () => {
           fromItem = e.fromItem
           toItem = e.toItem
         })
-        const wrapper = mount(<Paginationbar totalItems={15} onTurnPage={onTurnPage}/>)
+        const wrapper = mount(<Paginationbar totalItems={15} onTurnPage={onTurnPage} {...c}/>)
   
         // [Current Page: 1]
         wrapper.find("button").hostNodes().at(4).simulate('click')
@@ -263,5 +276,11 @@ describe('Paginationbar', () => {
         expect(toItem).toBe(14)
       })
     })
+  }
+
+  describe('Event onTurnPage', () => {
+    testEventOnTurnPage({ })
+    testEventOnTurnPage({ first: 2 })
+    testEventOnTurnPage({ first: 3 })
   })
 })
