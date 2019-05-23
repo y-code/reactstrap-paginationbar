@@ -15,6 +15,7 @@ class Sample2 extends React.Component {
       pageSize: 6,
       visibility: 3,
       ellipsis: true,
+      first: 1,
     };
   }
 
@@ -38,6 +39,7 @@ class Sample2 extends React.Component {
               className='sample'
               totalItems={this.props.data.length}
               pageSize={this.state.pageSize}
+              first={this.state.first}
               current={this.state.page}
               visibility={this.state.visibility}
               ellipsis={this.state.ellipsis}
@@ -114,6 +116,15 @@ class Sample2 extends React.Component {
               <Button disabled color='info'>Ellipsis Usage</Button>
               <Button onClick={() => this.setState({ellipsis: true})} active={this.state.ellipsis}>Use</Button>
               <Button onClick={() => this.setState({ellipsis: false})} active={!this.state.ellipsis}>Not use</Button>
+            </ButtonGroup>
+        </Col>
+        <Col sm='4' className='d-flex justify-content-center'>
+            <ButtonGroup>
+              <Button disabled color='info'>First Page</Button>
+              <Button onClick={() => this.setState({first: 1})} active={this.state.first === 1}>1</Button>
+              <Button onClick={() => this.setState({first: 3})} active={this.state.first === 3}>3</Button>
+              <Button onClick={() => this.setState({first: 5})} active={this.state.first === 5}>5</Button>
+              <Button onClick={() => this.setState({first: -3})} active={this.state.first === -3}>-3</Button>
             </ButtonGroup>
         </Col>
       </Row>

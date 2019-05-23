@@ -24,8 +24,7 @@ const defaultProps = {
 class Paginationbar extends React.Component {
   constructor(props) {
     super(props)
-    this.firstPage = this.props.first
-    this.lastPage = getLastPage(props.first, props.totalItems, props.pageSize)
+    this.last = getLast(props.totalItems, props.pageSize)
     this.state = {
       current: props.current || this.props.first
     }
@@ -36,37 +35,38 @@ class Paginationbar extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.current && nextProps.current !== this.state.current) {
+    if (nextProps.current && (nextProps.current - nextProps.first + 1) !== this.state.current) {
       this.setState({
-        current: nextProps.current
+        current: nextProps.current - nextProps.first + 1
       })
     }
     if (nextProps.first !== this.props.first
       || nextProps.totalItems !== this.props.totalItems
       || nextProps.pageSize !== this.props.pageSize) {
-        this.lastPage = getLastPage(nextProps.first, nextProps.totalItems, nextProps.pageSize)
+        this.last = getLast(nextProps.totalItems, nextProps.pageSize)
         this.triggerTurnPage(nextProps.first, nextProps)
       }
   }
 
   handleGoTo(page) {
-    if (page === this.state.current)
+    if (page === this.state.current + (this.props.first - 1))
       return
 
     this.triggerTurnPage(page, this.props)
   }
 
   triggerTurnPage(page, props) {
-    this.setState({
-      current: page
-    })
-
     const {
       totalItems,
       pageSize,
+      first,
     } = props
-    const fromItem = pageSize * (page - 1)
-    const toItem = Math.min(pageSize * page - 1, totalItems - 1)
+    const current = page - first + 1
+
+    this.setState({ current })
+
+    const fromItem = pageSize * (current - 1)
+    const toItem = Math.min(pageSize * current - 1, totalItems - 1)
     if (this.props.onTurnPage)
       this.props.onTurnPage({ page, fromItem, toItem })
   }
@@ -82,9 +82,9 @@ class Paginationbar extends React.Component {
       'aria-label': label,
     } = this.props
 
-    const currentPage = this.state.current
     const firstPage = this.props.first
-    const lastPage = this.lastPage
+    const lastPage = firstPage + this.last - 1
+    const currentPage = firstPage + this.state.current - 1
     const previousPage = currentPage > firstPage ? currentPage - 1 : firstPage
     const nextPage = currentPage < lastPage ? currentPage + 1 : lastPage
 
@@ -93,14 +93,14 @@ class Paginationbar extends React.Component {
         <PaginationItem onClick={() => { if (firstPage !== currentPage) this.handleGoTo(firstPage) }} disabled={firstPage === currentPage}>
           <PaginationLink first />
         </PaginationItem>
-        <PaginationItem onClick={() => this.handleGoTo(previousPage)} disabled={previousPage === currentPage}>
+        <PaginationItem onClick={() => { if (previousPage !== currentPage) this.handleGoTo(previousPage) }} disabled={previousPage === currentPage}>
           <PaginationLink previous />
         </PaginationItem>
         {this.renderPages(currentPage, firstPage, lastPage)}
-        <PaginationItem onClick={() => this.handleGoTo(nextPage)} disabled={nextPage === currentPage}>
+        <PaginationItem onClick={() => { if (nextPage !== currentPage) this.handleGoTo(nextPage) }} disabled={nextPage === currentPage}>
           <PaginationLink next />
         </PaginationItem>
-        <PaginationItem onClick={() => this.handleGoTo(lastPage)} disabled={lastPage === currentPage}>
+        <PaginationItem onClick={() => { if (lastPage !== currentPage) this.handleGoTo(lastPage) }} disabled={lastPage === currentPage}>
           <PaginationLink last />
         </PaginationItem>
       </Pagination>
@@ -120,15 +120,15 @@ class Paginationbar extends React.Component {
     if (!visibility) {
       visibleFirstPage = firstPage
       visibleLastPage = lastPage
-    } else if (lastPage < visibility * 2) {
+    } else if (this.last < visibility * 2) {
       visibleFirstPage = firstPage
       visibleLastPage = lastPage
-    } else if (currentPage < visibility + 1) {
+    } else if (this.state.current < visibility + 1) {
       visibleFirstPage = firstPage
       visibleLastPage = firstPage + (visibility - 1) * 2 + (ellipsis ? 1 : 0)
       hasPreviousEllipsis = false
       hasNextEllipsis = true
-      } else if (currentPage > lastPage - visibility) {
+      } else if (this.state.current > this.last - visibility) {
       visibleFirstPage = lastPage - (visibility - 1) * 2 + (ellipsis ? -1 : 0)
       visibleLastPage = lastPage
       hasPreviousEllipsis = true
@@ -156,7 +156,7 @@ class Paginationbar extends React.Component {
       pages.push(
         <PaginationItem
           key={`page-${i}`}
-          onClick={() => this.handleGoTo(i)}
+          onClick={() => { if (i !== currentPage) this.handleGoTo(i) }}
           active={i === currentPage}
         >
           <PaginationLink>
@@ -181,7 +181,7 @@ class Paginationbar extends React.Component {
   }
 }
 
-let getLastPage = (firstPage, totalItems, pageSize) => ( totalItems ? Math.floor(totalItems / pageSize) + !!(totalItems % pageSize) + (firstPage - 1) : firstPage )
+let getLast = (totalItems, pageSize) => ( totalItems ? Math.floor(totalItems / pageSize) + !!(totalItems % pageSize) : 1 )
 
 Paginationbar.propTypes = propTypes
 Paginationbar.defaultProps = defaultProps
