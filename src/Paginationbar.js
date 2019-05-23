@@ -128,17 +128,17 @@ class Paginationbar extends React.Component {
       visibleLastPage = firstPage + (visibility - 1) * 2 + (ellipsis ? 1 : 0)
       hasPreviousEllipsis = false
       hasNextEllipsis = true
-      } else if (this.state.current > this.last - visibility) {
+    } else if (this.state.current > this.last - visibility) {
       visibleFirstPage = lastPage - (visibility - 1) * 2 + (ellipsis ? -1 : 0)
       visibleLastPage = lastPage
       hasPreviousEllipsis = true
       hasNextEllipsis = false
-      } else {
+    } else {
       visibleFirstPage = currentPage - visibility + 1
       visibleLastPage = currentPage + visibility - 1
       hasPreviousEllipsis = true
       hasNextEllipsis = true
-      }
+    }
 
     if (ellipsis && hasPreviousEllipsis)
       pages.push(
