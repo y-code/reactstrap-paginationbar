@@ -3,7 +3,7 @@ import { Pagination, PaginationItem, PaginationLink } from 'reactstrap'
 import PropTypes from 'prop-types'
 
 const propTypes = {
-  totalItems: PropTypes.number,
+  totalItems: PropTypes.oneOfType([PropTypes.number, PropTypes.array],),
   pageSize: PropTypes.number,
   first: PropTypes.number,
   current: PropTypes.number,
@@ -16,7 +16,6 @@ const defaultProps = {
   totalItems: 0,
   pageSize: 10,
   first: 1,
-  current: 0,
   visibility: 3,
   ellipsis: true,
 }
@@ -24,28 +23,36 @@ const defaultProps = {
 class Paginationbar extends React.Component {
   constructor(props) {
     super(props)
-    this.last = getLast(props.totalItems, props.pageSize)
+
+    // Revision
+    this.totalItems = reviseTotalItems(props.totalItems)
+
+    this.last = getLast(this.totalItems, props.pageSize)
     this.state = {
       current: props.current || this.props.first
     }
   }
 
   componentDidMount() {
-    this.triggerTurnPage(this.state.current, this.props)
+    this.triggerTurnPage(this.state.current, { ...this.props, totalItems: this.totalItems })
   }
 
   componentWillReceiveProps(nextProps) {
+    var nextTotalItems = reviseTotalItems(nextProps.totalItems)
+
     if (nextProps.current && (nextProps.current - nextProps.first + 1) !== this.state.current) {
       this.setState({
         current: nextProps.current - nextProps.first + 1
       })
     }
     if (nextProps.first !== this.props.first
-      || nextProps.totalItems !== this.props.totalItems
+      || nextTotalItems !== this.totalItems
       || nextProps.pageSize !== this.props.pageSize) {
-        this.last = getLast(nextProps.totalItems, nextProps.pageSize)
-        this.triggerTurnPage(nextProps.first, nextProps)
+        this.last = getLast(nextTotalItems, nextProps.pageSize)
+        this.triggerTurnPage(nextProps.first, { ...nextProps, totalItems: nextTotalItems })
       }
+
+    this.totalItems = nextTotalItems
   }
 
   handleGoTo(page) {
@@ -65,10 +72,15 @@ class Paginationbar extends React.Component {
 
     this.setState({ current })
 
-    const fromItem = pageSize * (current - 1)
-    const toItem = Math.min(pageSize * current - 1, totalItems - 1)
-    if (this.props.onTurnPage)
-      this.props.onTurnPage({ page, fromItem, toItem })
+    if (this.props.onTurnPage) {
+      if (totalItems === 0) {
+        this.props.onTurnPage({ page: 1, fromItem: Number.NaN, toItem: Number.NaN })
+      } else {
+        const fromItem = pageSize * (current - 1)
+        const toItem = Math.min(pageSize * current - 1, totalItems - 1)
+        this.props.onTurnPage({ page, fromItem, toItem })
+      }
+    }
   }
 
   render() {
@@ -178,6 +190,26 @@ class Paginationbar extends React.Component {
       )
 
     return pages
+  }
+}
+
+/**
+ * Revise totalItems property of Paginationbar class
+ * @param {(number\|array)} totalItems - This must be totalItems property of Paginationbar class
+ */
+function reviseTotalItems(totalItems) {
+  if (isNaN(totalItems))
+    return totalItems.length
+  else if (totalItems < 0) {
+    console.error(`Negative number prop \`totalItems\` supplied to \`Paginationbar\`.`)
+    return 0
+  }
+  else if (Number.isInteger(totalItems))
+    return totalItems
+  else {
+    let revised = Math.ceil(totalItems)
+    console.error(`Non-integer number prop \`totalItems\` supplied to \`Paginationbar\`. ${totalItems} is revised to ${revised}`)
+    return revised
   }
 }
 
