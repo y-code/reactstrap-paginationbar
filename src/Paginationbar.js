@@ -2,15 +2,39 @@ import React from 'react'
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap'
 import PropTypes from 'prop-types'
 
+/* Validation */
+
+class CustomPropTypes {
+  static natualNumber(props, propName, componentName, location, propFullName, secret) {
+    var error = PropTypes.number(props, propName, componentName, location, propFullName, secret)
+    const value = props[propName]
+    if (error || value < 0 || !Number.isInteger(value))
+      return new Error(`Invalid prop \`${propName}\` supplied to \`Paginationbar\`, expected a natural number.`)
+  }
+  static arrayOrNatualNumber(props, propName, componentName, location, propFullName, secret) {
+    var error = PropTypes.oneOfType([CustomPropTypes.natualNumber, PropTypes.array])(props, propName, componentName, location, propFullName, secret)
+    if (error)
+      return new Error(`Invalid prop \`${propName}\` supplied to \`Paginationbar\`, expected an array or a natural number.`)
+  }
+}
+
 const propTypes = {
-  totalItems: PropTypes.oneOfType([PropTypes.number, PropTypes.array],),
-  pageSize: PropTypes.number,
+  totalItems: CustomPropTypes.arrayOrNatualNumber,
+  pageSize: CustomPropTypes.natualNumber,
   first: PropTypes.number,
   current: PropTypes.number,
   visibility: PropTypes.number,
   ellipsis: PropTypes.bool,
   onTurnPage: PropTypes.func,
 }
+
+/* Revision */
+
+let reviseToNatualNumber = n => isNaN(n) ? 0 : Math.ceil(Math.max(0, n))
+let reviseTotalItems = totalItems => totalItems.length || reviseToNatualNumber(totalItems)
+let revisePageSize = pageSize => reviseToNatualNumber(pageSize)
+
+/* Component */
 
 const defaultProps = {
   totalItems: 0,
@@ -24,10 +48,11 @@ class Paginationbar extends React.Component {
   constructor(props) {
     super(props)
 
-    // Revision
+    // revise props
     this.totalItems = reviseTotalItems(props.totalItems)
+    this.pageSize = revisePageSize(props.pageSize)
 
-    this.last = getLast(this.totalItems, props.pageSize)
+    this.last = getLast(this.totalItems, this.pageSize)
     this.state = {
       current: props.current || this.props.first
     }
@@ -39,6 +64,7 @@ class Paginationbar extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     var nextTotalItems = reviseTotalItems(nextProps.totalItems)
+    var nextPageSize = revisePageSize(nextProps.pageSize)
 
     if (nextProps.current && (nextProps.current - nextProps.first + 1) !== this.state.current) {
       this.setState({
@@ -47,12 +73,17 @@ class Paginationbar extends React.Component {
     }
     if (nextProps.first !== this.props.first
       || nextTotalItems !== this.totalItems
-      || nextProps.pageSize !== this.props.pageSize) {
-        this.last = getLast(nextTotalItems, nextProps.pageSize)
-        this.triggerTurnPage(nextProps.first, { ...nextProps, totalItems: nextTotalItems })
+      || nextPageSize !== this.pageSize) {
+        this.last = getLast(nextTotalItems, nextPageSize)
+        this.triggerTurnPage(nextProps.first, {
+          ...nextProps,
+          totalItems: nextTotalItems,
+          pageSize: nextPageSize
+        })
       }
 
     this.totalItems = nextTotalItems
+    this.pageSize = nextPageSize
   }
 
   handleGoTo(page) {
@@ -190,26 +221,6 @@ class Paginationbar extends React.Component {
       )
 
     return pages
-  }
-}
-
-/**
- * Revise totalItems property of Paginationbar class
- * @param {(number\|array)} totalItems - This must be totalItems property of Paginationbar class
- */
-function reviseTotalItems(totalItems) {
-  if (isNaN(totalItems))
-    return totalItems.length
-  else if (totalItems < 0) {
-    console.error(`Negative number prop \`totalItems\` supplied to \`Paginationbar\`.`)
-    return 0
-  }
-  else if (Number.isInteger(totalItems))
-    return totalItems
-  else {
-    let revised = Math.ceil(totalItems)
-    console.error(`Non-integer number prop \`totalItems\` supplied to \`Paginationbar\`. ${totalItems} is revised to ${revised}`)
-    return revised
   }
 }
 
