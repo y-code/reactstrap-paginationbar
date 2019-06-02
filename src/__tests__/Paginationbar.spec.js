@@ -1,6 +1,6 @@
 import React from 'react'
 import { shallow, mount } from 'enzyme'
-import { Paginationbar } from '..'
+import Paginationbar from '../Paginationbar'
 
 describe('Paginationbar', () => {
   it('should render a single "nav" tag, a single "ul" tag, five "li" tags, and five "button" tags by default', () => {
