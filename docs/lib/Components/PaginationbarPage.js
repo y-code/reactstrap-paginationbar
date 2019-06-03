@@ -34,7 +34,7 @@ export default class PaginationPage extends React.Component {
         <pre>
           <PrismCode className="language-jsx">
 {`Pagination.propTypes = {
-  totalItems: PropTypes.number,
+  totalItems: PropTypes.oneOfType([PropTypes.number, PropTypes.array]),
   pageSize: PropTypes.number,
   first: PropTypes.number,
   current: PropTypes.number,

@@ -2,12 +2,46 @@ import React from 'react'
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap'
 import PropTypes from 'prop-types'
 
+class CustomPropTypes {
+  static integer(props, propName, componentName, location, propFullName, secret) {
+    let error = PropTypes.number(props, propName, componentName, location, propFullName, secret)
+
+    const value = props[propName]
+    if (error || (!isNaN(value) && !Number.isInteger(value)))
+      return new Error(`Invalid prop \`${propName}\` supplied to \`Paginationbar\`, expected an integer.`)
+    return null
+  }
+  static natualNumber(props, propName, componentName, location, propFullName, secret) {
+    let error = CustomPropTypes.integer(props, propName, componentName, location, propFullName, secret)
+
+    const value = props[propName]
+    if (error || (!isNaN(value) && value < 0))
+      return new Error(`Invalid prop \`${propName}\` supplied to \`Paginationbar\`, expected a natural number.`)
+    return null
+  }
+  static arrayOrNatualNumber(props, propName, componentName, location, propFullName, secret) {
+    let error = PropTypes.oneOfType([CustomPropTypes.natualNumber, PropTypes.array])(props, propName, componentName, location, propFullName, secret)
+    if (error)
+      return new Error(`Invalid prop \`${propName}\` supplied to \`Paginationbar\`, expected an array or a natural number.`)
+    return null
+  }
+  static currentPageNumber(props, propName, componentName, location, propFullName, secret) {
+    let error = CustomPropTypes.integer(props, propName, componentName, location, propFullName, secret);
+
+    const { totalItems, pageSize, current, first } = props
+    const last = getLast(reviseTotalItems(totalItems), revisePageSize(pageSize))
+    if (error || (!isNaN(current) && (current < first || last < current)))
+      return new Error(`Invalid prop \`${propName}\` supplied to \`Paginationbar\`, expected an integer number more than the first page and less than the last page.`)
+    return null
+  }
+}
+
 const propTypes = {
-  totalItems: PropTypes.number,
-  pageSize: PropTypes.number,
-  first: PropTypes.number,
-  current: PropTypes.number,
-  visibility: PropTypes.number,
+  totalItems: CustomPropTypes.arrayOrNatualNumber,
+  pageSize: CustomPropTypes.natualNumber,
+  first: CustomPropTypes.integer,
+  current: CustomPropTypes.currentPageNumber,
+  visibility: CustomPropTypes.natualNumber,
   ellipsis: PropTypes.bool,
   onTurnPage: PropTypes.func,
 }
@@ -16,43 +50,72 @@ const defaultProps = {
   totalItems: 0,
   pageSize: 10,
   first: 1,
-  current: 0,
   visibility: 3,
   ellipsis: true,
 }
 
+let reviseToIntegerNumber = (n, d) => isNaN(n) ? d : Math.ceil(n)
+let reviseToNatualNumber = (n, d) => {
+  var r = reviseToIntegerNumber(n, d)
+  return r < 0 ? d : r
+}
+let reviseTotalItems = totalItems => totalItems instanceof Array ? totalItems.length : reviseToNatualNumber(totalItems, defaultProps.totalItems)
+let revisePageSize = pageSize => reviseToNatualNumber(pageSize, defaultProps.pageSize)
+let reviseFirst = first => reviseToIntegerNumber(first, defaultProps.first)
+let reviseCurrent = current => reviseToIntegerNumber(current, undefined)
+let reviseVisibility = visibility => reviseToNatualNumber(visibility, defaultProps.visibility)
+let reviseEllipsis = ellipsis => typeof ellipsis === "boolean" ? ellipsis : defaultProps.ellipsis
+let reviseOnTurnPage = onTurnPage => typeof onTurnPage === "function" ? onTurnPage : undefined
+let reviseProps = props => ({
+  ...props,
+  totalItems: reviseTotalItems(props.totalItems),
+  pageSize: revisePageSize(props.pageSize),
+  first: reviseFirst(props.first),
+  current: reviseCurrent(props.current),
+  visibility: reviseVisibility(props.visibility),
+  ellipsis: reviseEllipsis(props.ellipsis),
+  onTurnPage: reviseOnTurnPage(props.onTurnPage),
+})
+
 class Paginationbar extends React.Component {
   constructor(props) {
     super(props)
-    this.last = getLast(props.totalItems, props.pageSize)
+
+    this.rProps = reviseProps(props)
+
+    this.last = getLast(this.rProps.totalItems, this.rProps.pageSize)
     this.state = {
-      current: props.current || this.props.first
+      current: this.rProps.current || this.rProps.first
     }
   }
 
   componentDidMount() {
-    this.triggerTurnPage(this.state.current, this.props)
+    this.triggerTurnPage(this.state.current, this.rProps)
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.current && (nextProps.current - nextProps.first + 1) !== this.state.current) {
+    const rNextProps = reviseProps(nextProps)
+
+    if (rNextProps.current && (rNextProps.current - rNextProps.first + 1) !== this.rProps.current) {
       this.setState({
-        current: nextProps.current - nextProps.first + 1
+        current: rNextProps.current - rNextProps.first + 1
       })
     }
-    if (nextProps.first !== this.props.first
-      || nextProps.totalItems !== this.props.totalItems
-      || nextProps.pageSize !== this.props.pageSize) {
-        this.last = getLast(nextProps.totalItems, nextProps.pageSize)
-        this.triggerTurnPage(nextProps.first, nextProps)
-      }
+    if (rNextProps.first !== this.rProps.first
+      || rNextProps.totalItems !== this.rProps.totalItems
+      || rNextProps.pageSize !== this.rProps.pageSize) {
+      this.last = getLast(rNextProps.totalItems, rNextProps.pageSize)
+      this.triggerTurnPage(rNextProps.first, rNextProps)
+    }
+
+    this.rProps = rNextProps
   }
 
   handleGoTo(page) {
-    if (page === this.state.current + (this.props.first - 1))
+    if (page === this.state.current + (this.rProps.first - 1))
       return
 
-    this.triggerTurnPage(page, this.props)
+    this.triggerTurnPage(page, this.rProps)
   }
 
   triggerTurnPage(page, props) {
@@ -65,10 +128,15 @@ class Paginationbar extends React.Component {
 
     this.setState({ current })
 
-    const fromItem = pageSize * (current - 1)
-    const toItem = Math.min(pageSize * current - 1, totalItems - 1)
-    if (this.props.onTurnPage)
-      this.props.onTurnPage({ page, fromItem, toItem })
+    if (this.rProps.onTurnPage) {
+      if (totalItems === 0) {
+        this.rProps.onTurnPage({ page: 1, fromItem: Number.NaN, toItem: Number.NaN })
+      } else {
+        const fromItem = pageSize * (current - 1)
+        const toItem = Math.min(pageSize * current - 1, totalItems - 1)
+        this.rProps.onTurnPage({ page, fromItem, toItem })
+      }
+    }
   }
 
   render() {
@@ -80,9 +148,9 @@ class Paginationbar extends React.Component {
       tag,
       listTag,
       'aria-label': label,
-    } = this.props
+    } = this.rProps
 
-    const firstPage = this.props.first
+    const firstPage = this.rProps.first
     const lastPage = firstPage + this.last - 1
     const currentPage = firstPage + this.state.current - 1
     const previousPage = currentPage > firstPage ? currentPage - 1 : firstPage
@@ -111,7 +179,7 @@ class Paginationbar extends React.Component {
     const {
       visibility,
       ellipsis,
-    } = this.props
+    } = this.rProps
     let pages = []
     let visibleFirstPage, visibleLastPage
     let hasPreviousEllipsis = false
@@ -187,3 +255,4 @@ Paginationbar.propTypes = propTypes
 Paginationbar.defaultProps = defaultProps
 
 export default Paginationbar
+export { CustomPropTypes }
