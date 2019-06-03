@@ -41,7 +41,7 @@ const propTypes = {
   pageSize: CustomPropTypes.natualNumber,
   first: CustomPropTypes.integer,
   current: CustomPropTypes.currentPageNumber,
-  visibility: PropTypes.number,
+  visibility: CustomPropTypes.natualNumber,
   ellipsis: PropTypes.bool,
   onTurnPage: PropTypes.func,
 }
@@ -55,19 +55,23 @@ const defaultProps = {
 }
 
 let reviseToIntegerNumber = (n, d) => isNaN(n) ? d : Math.ceil(n)
-let reviseToNatualNumber = (n, d) => Math.max(0, reviseToIntegerNumber(n, d))
+let reviseToNatualNumber = (n, d) => {
+  var r = reviseToIntegerNumber(n, d)
+  return r < 0 ? d : r
+}
 let reviseTotalItems = totalItems => totalItems.length || reviseToNatualNumber(totalItems, defaultProps.totalItems)
 let revisePageSize = pageSize => reviseToNatualNumber(pageSize, defaultProps.pageSize)
 let reviseFirst = first => reviseToIntegerNumber(first, defaultProps.first)
-let reviseCurrent = current => isNaN(current) ? undefined : reviseToIntegerNumber(current, undefined)
-let reviseProps = props => {
-  let revised = { ...props }
-  revised.totalItems = reviseTotalItems(props.totalItems)
-  revised.pageSize = revisePageSize(props.pageSize)
-  revised.first = reviseFirst(props.first)
-  revised.current = reviseCurrent(props.current)
-  return revised
-}
+let reviseCurrent = current => reviseToIntegerNumber(current, undefined)
+let reviseVisibility = visibility => reviseToNatualNumber(visibility, defaultProps.visibility)
+let reviseProps = props => ({
+  ...props,
+  totalItems: reviseTotalItems(props.totalItems),
+  pageSize: revisePageSize(props.pageSize),
+  first: reviseFirst(props.first),
+  current: reviseCurrent(props.current),
+  visibility: reviseVisibility(props.visibility),
+})
 
 class Paginationbar extends React.Component {
   constructor(props) {
