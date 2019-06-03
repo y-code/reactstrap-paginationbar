@@ -59,11 +59,13 @@ let reviseToNatualNumber = (n, d) => {
   var r = reviseToIntegerNumber(n, d)
   return r < 0 ? d : r
 }
-let reviseTotalItems = totalItems => totalItems.length || reviseToNatualNumber(totalItems, defaultProps.totalItems)
+let reviseTotalItems = totalItems => totalItems instanceof Array ? totalItems.length : reviseToNatualNumber(totalItems, defaultProps.totalItems)
 let revisePageSize = pageSize => reviseToNatualNumber(pageSize, defaultProps.pageSize)
 let reviseFirst = first => reviseToIntegerNumber(first, defaultProps.first)
 let reviseCurrent = current => reviseToIntegerNumber(current, undefined)
 let reviseVisibility = visibility => reviseToNatualNumber(visibility, defaultProps.visibility)
+let reviseEllipsis = ellipsis => typeof ellipsis === "boolean" ? ellipsis : defaultProps.ellipsis
+let reviseOnTurnPage = onTurnPage => typeof onTurnPage === "function" ? onTurnPage : undefined
 let reviseProps = props => ({
   ...props,
   totalItems: reviseTotalItems(props.totalItems),
@@ -71,6 +73,8 @@ let reviseProps = props => ({
   first: reviseFirst(props.first),
   current: reviseCurrent(props.current),
   visibility: reviseVisibility(props.visibility),
+  ellipsis: reviseEllipsis(props.ellipsis),
+  onTurnPage: reviseOnTurnPage(props.onTurnPage),
 })
 
 class Paginationbar extends React.Component {
@@ -124,13 +128,13 @@ class Paginationbar extends React.Component {
 
     this.setState({ current })
 
-    if (this.props.onTurnPage) {
+    if (this.rProps.onTurnPage) {
       if (totalItems === 0) {
-        this.props.onTurnPage({ page: 1, fromItem: Number.NaN, toItem: Number.NaN })
+        this.rProps.onTurnPage({ page: 1, fromItem: Number.NaN, toItem: Number.NaN })
       } else {
         const fromItem = pageSize * (current - 1)
         const toItem = Math.min(pageSize * current - 1, totalItems - 1)
-        this.props.onTurnPage({ page, fromItem, toItem })
+        this.rProps.onTurnPage({ page, fromItem, toItem })
       }
     }
   }

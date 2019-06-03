@@ -18,27 +18,71 @@ describe('Paginationbar', () => {
       expect(wrapper.instance().props.totalItems).toBe(0)
     })
 
-    it('can be an array', () => {
-      // Total Items: 11 (set by array)
-      // Page size: default (= 10)
-      // First Page: default (= 1)
-      // Current Page: default (= undefined)
-      // Visibility Level: default (= 3)
-      const wrapper = mount(<Paginationbar totalItems={['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']}/>)
-      var nodes = wrapper.find('li button').hostNodes()
-      var visiblePages = 0;
-      for (let i = 0; i < nodes.length; i++)
-        if (!isNaN(nodes.at(i).text()))
-          visiblePages++;
-      expect(visiblePages).toBe(2)
+    it('should not be revised, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={3}/>)
+      expect(wrapper.instance().rProps.totalItems).toBe(3)
+    })
+
+    it('should be revised to default value, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={-3}/>)
+      expect(wrapper.instance().rProps.totalItems).toBe(0)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={'a'}/>)
+      expect(wrapper.instance().rProps.totalItems).toBe(0)
+    })
+
+    it('should be revised to number value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={'3'}/>)
+      expect(wrapper.instance().rProps.totalItems).toBe(3)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={{totalItems: 1}}/>)
+      expect(wrapper.instance().rProps.totalItems).toBe(0)
+    })
+
+    it('should be revised to length of the array, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.totalItems).toBe(5)
     })
   })
 
-  describe('Property current', () => {
-    it('should be defaulted to undefined and handled as state.current = 1', () => {
-      const wrapper = shallow(<Paginationbar />)
-      expect(wrapper.instance().props.current).toBe(undefined)
-      expect(wrapper.instance().state.current).toBe(1)
+  describe('Property pageSize', () => {
+    it('should be defaulted to 10', () => {
+      const wrapper = shallow(<Paginationbar totalItems={65}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(10)
+    })
+
+    it('should not be revised, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} pageSize={3}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(3)
+    })
+
+    it('should be revised to default value, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} pageSize={-3}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(10)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} pageSize={'a'}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(10)
+    })
+
+    it('should be revised to number value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} pageSize={'3'}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(3)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} pageSize={{first: 1}}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(10)
+    })
+
+    it('should be revised to default value, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} pageSize={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.pageSize).toBe(10)
     })
   })
 
@@ -52,6 +96,195 @@ describe('Paginationbar', () => {
       const wrapper = mount(<Paginationbar totalItems={65}/>)
       expect(wrapper.find('li.active').find("button").hostNodes().text()).toBe('1')
       expect(wrapper.find('li').find("button").hostNodes().at(2).text()).toBe('1')
+    })
+
+    it('should not be revised, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} first={3}/>)
+      expect(wrapper.instance().rProps.first).toBe(3)
+    })
+
+    it('should not be revised, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} first={-3}/>)
+      expect(wrapper.instance().rProps.first).toBe(-3)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} first={'a'}/>)
+      expect(wrapper.instance().rProps.first).toBe(1)
+    })
+
+    it('should be revised to number value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} first={'3'}/>)
+      expect(wrapper.instance().rProps.first).toBe(3)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} first={{first: 1}}/>)
+      expect(wrapper.instance().rProps.first).toBe(1)
+    })
+
+    it('should be revised to default value, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} first={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.first).toBe(1)
+    })
+  })
+
+  describe('Property current', () => {
+    it('should be defaulted to undefined and handled as state.current = 1', () => {
+      const wrapper = shallow(<Paginationbar />)
+      expect(wrapper.instance().props.current).toBe(undefined)
+      expect(wrapper.instance().state.current).toBe(1)
+    })
+
+    it('should not be revised, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} current={3}/>)
+      expect(wrapper.instance().rProps.current).toBe(3)
+    })
+
+    it('should not be revised, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} current={-3}/>)
+      expect(wrapper.instance().rProps.current).toBe(-3)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} current={'a'}/>)
+      expect(wrapper.instance().rProps.current).toBe(undefined)
+    })
+
+    it('should be revised to number value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} current={'3'}/>)
+      expect(wrapper.instance().rProps.current).toBe(3)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} current={{current: 1}}/>)
+      expect(wrapper.instance().rProps.current).toBe(undefined)
+    })
+
+    it('should be revised to default value, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} current={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.current).toBe(undefined)
+    })
+  })
+
+  describe('Property visibility', () => {
+    it('should be defaulted to 3', () => {
+      const wrapper = shallow(<Paginationbar totalItems={65}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(3)
+    })
+
+    it('should not be revised, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} visibility={5}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(5)
+    })
+
+    it('should be revised to default value, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} visibility={-6}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(3)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} visibility={'a'}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(3)
+    })
+
+    it('should be revised to number value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} visibility={'4'}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(4)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} visibility={{first: 1}}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(3)
+    })
+
+    it('should be revised to default value, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} visibility={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.visibility).toBe(3)
+    })
+  })
+
+  describe('Property ellipsis', () => {
+    it('should be defaulted to 3', () => {
+      const wrapper = shallow(<Paginationbar totalItems={65}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+
+    it('should not be revised, given a boolean is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={false}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(false)
+    })
+
+    it('should be revised to default value, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={5}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+
+    it('should be revised to default value, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={-6}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={'a'}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+
+    it('should be revised to default value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={'4'}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={{first: 1}}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+
+    it('should be revised to default value, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} ellipsis={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.ellipsis).toBe(true)
+    })
+  })
+
+  describe('Property onTurnPage', () => {
+    it('should be defaulted to 3', () => {
+      const wrapper = shallow(<Paginationbar totalItems={65}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
+    })
+
+    it('should not be revised, given a function is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={() => {}}/>)
+      expect(typeof wrapper.instance().rProps.onTurnPage).toBe("function")
+    })
+
+    it('should be revised to default value, given a positive number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={5}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
+    })
+
+    it('should be revised to default value, given a negative number is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={-6}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
+    })
+
+    it('should be revised to default value, given a string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={'a'}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
+    })
+
+    it('should be revised to default value, given a number string is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={'4'}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
+    })
+
+    it('should be revised to default value, given a object is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={{first: 1}}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
+    })
+
+    it('should be revised to default value, given an array is provided', () => {
+      const wrapper = shallow(<Paginationbar totalItems={50} onTurnPage={[1, 2, 3, 4, 5]}/>)
+      expect(wrapper.instance().rProps.onTurnPage).toBe(undefined)
     })
   })
 
