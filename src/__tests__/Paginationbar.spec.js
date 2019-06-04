@@ -296,7 +296,7 @@ describe('Paginationbar', () => {
       expect(onTurnPage).toHaveBeenCalledTimes(1)
     })
 
-    it('is triggered only when page button is clicked and page transition is required, given there is no item', () => {
+    it('is never triggered even when any button is clicked, given there is no item', () => {
       // Total Items: default (= 0)
       // Page size: default (= 10)
       // Current Page: default (= undefined)
@@ -323,17 +323,17 @@ describe('Paginationbar', () => {
       expect(onTurnPage).toHaveBeenCalledTimes(clickCount)
       // [Current Page: 1]
       // Click Go-to-Next button
-      // then it should trigger onTurnPage event
+      // then it should not trigger onTurnPage event
       wrapper.find('button').hostNodes().at(3).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(clickCount)
       // [Current Page: 1]
       // Click Go-to-Last button
-      // then it should trigger onTurnPage event
+      // then it should not trigger onTurnPage event
       wrapper.find('button').hostNodes().at(4).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(clickCount)
     })
 
-    it('is triggered only when page button is clicked and page transition is required, given there is only one page', () => {
+    it('is never triggered even when any button is clicked, given there is only one page', () => {
       // Total Items: 10
       // Page size: default (= 10)
       // Current Page: default (= undefined)
@@ -360,23 +360,23 @@ describe('Paginationbar', () => {
       expect(onTurnPage).toHaveBeenCalledTimes(clickCount)
       // [Current Page: 1]
       // Click Go-to-Next button
-      // then it should trigger onTurnPage event
+      // then it should not trigger onTurnPage event
       wrapper.find('button').hostNodes().at(3).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(clickCount)
       // [Current Page: 1]
       // Click Go-to-Last button
-      // then it should trigger onTurnPage event
+      // then it should not trigger onTurnPage event
       wrapper.find('button').hostNodes().at(4).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(clickCount)
     })
 
-    it('is triggered only when page button is clicked and page transition is required, given there are more than 2 pages', () => {
+    it('is triggered with Event Data which page is the destination page, only when button is clicked and page transition is required, given there are more than 2 pages', () => {
       // Total Items: 40
       // Page size: default (= 10)
       // Current Page: default (= undefined)
       // Visibility Level: 3
       const onTurnPage = jest.fn()
-      const wrapper = mount(<Paginationbar totalItems={40} onTurnPage={onTurnPage} {...c}/>)
+      const wrapper = mount(<Paginationbar totalItems={50} onTurnPage={onTurnPage} {...c}/>)
 
       let clickCount = 1
 
@@ -400,26 +400,31 @@ describe('Paginationbar', () => {
       // then it should trigger onTurnPage event
       wrapper.find('button').hostNodes().at(3).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(++clickCount)
+      expect(onTurnPage.mock.calls[clickCount - 1][0].page).toBe(2 + (c.first ? c.first - 1 : 0))
       // [Current Page: 2]
       // Click Go-to-Next button
       // then it should trigger onTurnPage event
-      wrapper.find('button').hostNodes().at(6).simulate('click')
-      expect(onTurnPage).toHaveBeenCalledTimes(++clickCount)
-      // [Current Page: 4]
-      // Click Go-to-Last button
-      // then it should trigger onTurnPage event
       wrapper.find('button').hostNodes().at(7).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(++clickCount)
+      expect(onTurnPage.mock.calls[clickCount - 1][0].page).toBe(3 + (c.first ? c.first - 1 : 0))
       // [Current Page: 3]
+      // Click Go-to-Last button
+      // then it should trigger onTurnPage event
+      wrapper.find('button').hostNodes().at(8).simulate('click')
+      expect(onTurnPage).toHaveBeenCalledTimes(++clickCount)
+      expect(onTurnPage.mock.calls[clickCount - 1][0].page).toBe(5 + (c.first ? c.first - 1 : 0))
+      // [Current Page: 5]
       // Click Go-to-Previous button
       // then it should trigger onTurnPage event this time
       wrapper.find('button').hostNodes().at(1).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(++clickCount)
-      // [Current Page: 1]
+      expect(onTurnPage.mock.calls[clickCount - 1][0].page).toBe(4 + (c.first ? c.first - 1 : 0))
+      // [Current Page: 4]
       // Click Go-to-First button
       // then it should trigger onTurnPage event this time
       wrapper.find('button').hostNodes().at(0).simulate('click')
       expect(onTurnPage).toHaveBeenCalledTimes(++clickCount)
+      expect(onTurnPage.mock.calls[clickCount - 1][0].page).toBe(1 + (c.first ? c.first - 1 : 0))
     })
 
     it('is called with Event Data which fromItem and toItem are NaN, given there is no totalItems property', () => {
@@ -623,5 +628,37 @@ describe('Paginationbar', () => {
     testEventOnTurnPage({ })
     testEventOnTurnPage({ first: 2 })
     testEventOnTurnPage({ first: 3 })
+  })
+
+  describe('Change in props', () => {
+    describe('Change in totalItems', () => {
+
+    })
+    describe('Change in pageSize', () => {
+
+    })
+    describe('Change in first', () => {
+
+    })
+    describe('Change in current', () => {
+
+    })
+    describe('Change in visibility', () => {
+
+    })
+    describe('Change in ellipsis', () => {
+    })
+    describe('Change in onTurnPage', () => {
+      it('should replace the event handler', () => {
+        var onTurnPage0 = jest.fn()
+        var onTurnPage1 = jest.fn()
+        var wrapper = mount(<Paginationbar totalItems={30} pageSize={3} onTurnPage={onTurnPage0}/>)
+        wrapper.setProps({ onTurnPage: onTurnPage1 })
+        wrapper.find('li button').hostNodes().at(3).simulate('click')
+
+        expect(onTurnPage0).toHaveBeenCalledTimes(1) //for the event call at mount
+        expect(onTurnPage1).toHaveBeenCalledTimes(1) //for the event call at click
+      })
+    })
   })
 })
